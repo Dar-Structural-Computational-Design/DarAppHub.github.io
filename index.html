@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dar AppHub — every structural tool, one launcher, One click away!</title>
+<meta name="description" content="Dar AppHub puts all of the Computational Design Team's engineering tools in one Windows-native app that keeps itself and every tool up to date automatically." />
+<link rel="icon" type="image/x-icon" href="logo.ico" />
+<style>
+  :root{
+    --bg:#0e0f13; --bg-elev:#15171d; --card:#171a21; --card-2:#1d212a;
+    --text:#eef1f6; --text-dim:#a3acbd; --muted:#727a8b;
+    --border:#262b36; --border-soft:#1f242e;
+    --accent:#4c8dff; --accent-2:#14b8a6; --violet:#8b5cf6; --amber:#f4a52b; --rose:#ef4759;
+    --glow:rgba(76,141,255,.45);
+    --radius:18px; --radius-sm:12px; --maxw:1140px;
+    --shadow:0 20px 50px -20px rgba(0,0,0,.65);
+    --font:"Segoe UI Variable","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+  }
+  [data-theme="light"]{
+    --bg:#f5f7fb; --bg-elev:#ffffff; --card:#ffffff; --card-2:#f1f4fa;
+    --text:#11151c; --text-dim:#48526a; --muted:#7a849a;
+    --border:#e4e9f2; --border-soft:#eef2f8;
+    --glow:rgba(76,141,255,.30);
+    --shadow:0 20px 50px -24px rgba(20,40,80,.28);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--font);background:var(--bg);color:var(--text);
+    line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  section{position:relative;padding:96px 0}
+  h1,h2,h3{line-height:1.12;letter-spacing:-.02em;font-weight:700}
+  h2{font-size:clamp(28px,4vw,42px)}
+  .eyebrow{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+  .lead{color:var(--text-dim);font-size:clamp(16px,2vw,19px);max-width:62ch}
+
+  /* ambient background glow */
+  .glow{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+  .glow::before,.glow::after{content:"";position:absolute;border-radius:50%;filter:blur(110px);opacity:.5}
+  .glow::before{width:620px;height:620px;background:var(--accent);top:-220px;left:-160px;opacity:.28}
+  .glow::after{width:560px;height:560px;background:var(--accent-2);top:280px;right:-200px;opacity:.18}
+
+  /* nav */
+  header{position:sticky;top:0;z-index:50;backdrop-filter:saturate(160%) blur(14px);
+    background:color-mix(in srgb,var(--bg) 72%,transparent);border-bottom:1px solid transparent;transition:border-color .3s}
+  header.scrolled{border-color:var(--border)}
+  nav{display:flex;align-items:center;gap:22px;height:66px}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:700;font-size:16px}
+  .brand .logo{width:34px;height:34px;border-radius:10px;overflow:hidden;display:grid;place-items:center;
+    background:linear-gradient(140deg,var(--accent),var(--violet));box-shadow:0 6px 20px -6px var(--glow)}
+  .brand .logo img{width:100%;height:100%;object-fit:cover;display:block}
+  .navlinks{display:flex;gap:26px;margin-left:auto}
+  .navlinks a{color:var(--text-dim);font-size:14.5px;font-weight:500;transition:color .2s}
+  .navlinks a:hover{color:var(--text)}
+  .navtools{display:flex;align-items:center;gap:10px}
+  .icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:var(--card);
+    color:var(--text);cursor:pointer;display:grid;place-items:center;font-size:16px;transition:.2s}
+  .icon-btn:hover{border-color:var(--accent);color:var(--accent)}
+  .btn{display:inline-flex;align-items:center;gap:8px;border-radius:11px;padding:11px 18px;font-weight:600;
+    font-size:14.5px;cursor:pointer;border:1px solid transparent;transition:transform .15s,box-shadow .2s,background .2s}
+  .btn:active{transform:translateY(1px)}
+  .btn-primary{background:linear-gradient(135deg,var(--accent),#3a78f0);color:#fff;box-shadow:0 10px 26px -10px var(--glow)}
+  .btn-primary:hover{box-shadow:0 14px 34px -10px var(--glow)}
+  .btn-ghost{background:var(--card);border-color:var(--border);color:var(--text)}
+  .btn-ghost:hover{border-color:var(--accent)}
+  @media(max-width:820px){.navlinks{display:none}}
+
+  /* hero */
+  .hero{padding-top:64px}
+  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:54px;align-items:center}
+  @media(max-width:920px){.hero-grid{grid-template-columns:1fr;gap:40px}}
+  .badge{display:inline-flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);
+    border-radius:999px;padding:6px 13px;font-size:13px;color:var(--text-dim);font-weight:600}
+  .badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent-2);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent-2) 25%,transparent)}
+  .hero h1{font-size:clamp(38px,6vw,62px);margin:20px 0 18px}
+  .hero h1 .grad{background:linear-gradient(120deg,var(--accent),var(--accent-2) 60%,var(--violet));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:30px}
+  .hero-note{margin-top:18px;font-size:13.5px;color:var(--muted)}
+
+  /* mock app window */
+  .mock{border-radius:var(--radius);border:1px solid var(--border);background:linear-gradient(180deg,var(--card-2),var(--card));
+    box-shadow:var(--shadow);overflow:hidden;transform:perspective(1400px) rotateY(-7deg) rotateX(3deg);transition:transform .5s}
+  .mock:hover{transform:perspective(1400px) rotateY(-2deg) rotateX(1deg)}
+  .mock .titlebar{display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--border-soft);
+    background:color-mix(in srgb,var(--card) 80%,transparent)}
+  .mock .titlebar .t{font-size:12.5px;font-weight:600;color:var(--text-dim);margin-left:6px}
+  .mock .titlebar .spacer{margin-left:auto;display:flex;gap:7px}
+  .mock .titlebar .w{width:11px;height:11px;border-radius:50%;background:var(--border)}
+  .mock .body{display:grid;grid-template-columns:148px 1fr;min-height:340px}
+  .mock .side{border-right:1px solid var(--border-soft);padding:14px 10px;display:flex;flex-direction:column;gap:4px}
+  .mock .nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;font-size:12.5px;color:var(--text-dim)}
+  .mock .nav-item.active{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--text)}
+  .mock .nav-item i{width:15px;text-align:center}
+  .mock .content{padding:16px 16px}
+  .mock .content h4{font-size:15px;margin-bottom:2px}
+  .mock .content .sub{font-size:11.5px;color:var(--muted);margin-bottom:14px}
+  .tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}
+  .tile{border:1px solid var(--border-soft);border-radius:12px;padding:13px;background:var(--card-2);transition:.25s}
+  .tile:hover{border-color:var(--accent);transform:translateY(-3px)}
+  .tile .ic{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-size:15px;margin-bottom:9px;color:#fff}
+  .tile .nm{font-size:12.5px;font-weight:600}
+  .tile .meta{font-size:10.5px;color:var(--muted)}
+  .tile .go{margin-top:10px;font-size:10.5px;font-weight:700;color:var(--accent)}
+  .infobar{margin:13px 16px 16px;display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:10px;
+    background:color-mix(in srgb,var(--amber) 16%,transparent);border:1px solid color-mix(in srgb,var(--amber) 45%,transparent);font-size:11.5px}
+  .infobar b{color:var(--amber)}
+  .infobar .pill{margin-left:auto;background:var(--amber);color:#1a1205;font-weight:700;padding:4px 10px;border-radius:7px;font-size:10.5px}
+
+  /* stats */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  @media(max-width:760px){.stats{grid-template-columns:repeat(2,1fr)}}
+  .stat{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:24px 20px;text-align:center}
+  .stat .n{font-size:clamp(28px,4vw,38px);font-weight:800;background:linear-gradient(120deg,var(--accent),var(--accent-2));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .stat .l{font-size:13px;color:var(--text-dim);margin-top:4px}
+
+  /* features */
+  .sec-head{max-width:660px;margin-bottom:46px}
+  .sec-head h2{margin:12px 0}
+  .features{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  @media(max-width:920px){.features{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:600px){.features{grid-template-columns:1fr}}
+  .feature{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:26px;transition:.3s;position:relative;overflow:hidden}
+  .feature:hover{border-color:color-mix(in srgb,var(--accent) 55%,var(--border));transform:translateY(-4px);box-shadow:var(--shadow)}
+  .feature .fic{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;font-size:22px;margin-bottom:16px;color:#fff}
+  .feature h3{font-size:18px;margin-bottom:8px}
+  .feature p{color:var(--text-dim);font-size:14.5px}
+
+  /* smart search demo */
+  .demo{background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow)}
+  .searchbox{display:flex;align-items:center;gap:12px;background:var(--card-2);border:1px solid var(--border);
+    border-radius:13px;padding:13px 16px;transition:border-color .2s}
+  .searchbox:focus-within{border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 16%,transparent)}
+  .searchbox svg{width:20px;height:20px;color:var(--muted);flex:none}
+  .searchbox input{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:16px;font-family:inherit}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 4px}
+  .chip{font-size:12.5px;color:var(--text-dim);background:var(--card);border:1px solid var(--border);
+    border-radius:999px;padding:6px 13px;cursor:pointer;transition:.2s}
+  .chip:hover{border-color:var(--accent);color:var(--accent)}
+  .results{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:20px}
+  @media(max-width:680px){.results{grid-template-columns:1fr}}
+  .rcard{border:1px solid var(--border);border-radius:14px;padding:18px;background:var(--card);transition:.2s;animation:pop .3s ease}
+  .rcard.hide{display:none}
+  .rcard .top{display:flex;align-items:center;gap:11px;margin-bottom:9px}
+  .rcard .ic{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;color:#fff;font-size:18px;flex:none}
+  .rcard .nm{font-weight:700;font-size:15px}
+  .rcard .cat{font-size:11.5px;color:var(--muted)}
+  .rcard .desc{font-size:13.5px;color:var(--text-dim)}
+  .rcard mark{background:color-mix(in srgb,var(--accent) 32%,transparent);color:var(--text);border-radius:3px;padding:0 2px}
+  .noresults{grid-column:1/-1;text-align:center;color:var(--muted);padding:24px;font-size:14px}
+  @keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* steps */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;counter-reset:s}
+  @media(max-width:860px){.steps{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:480px){.steps{grid-template-columns:1fr}}
+  .step{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;position:relative}
+  .step::before{counter-increment:s;content:counter(s);position:absolute;top:-16px;left:22px;width:34px;height:34px;border-radius:10px;
+    display:grid;place-items:center;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--accent),var(--violet));box-shadow:0 8px 20px -8px var(--glow)}
+  .step h3{font-size:16px;margin:14px 0 6px}
+  .step p{font-size:14px;color:var(--text-dim)}
+
+  /* split (admin) */
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+  @media(max-width:880px){.split{grid-template-columns:1fr;gap:34px}}
+  .checklist{list-style:none;margin-top:22px;display:flex;flex-direction:column;gap:14px}
+  .checklist li{display:flex;gap:13px;align-items:flex-start;font-size:15px}
+  .checklist .ck{flex:none;width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font-size:13px;color:#fff;
+    background:linear-gradient(135deg,var(--accent-2),#0d9488)}
+  .checklist b{color:var(--text)}
+  .checklist span{color:var(--text-dim)}
+  .dashcard{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow)}
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+  .kpi{background:var(--card-2);border:1px solid var(--border-soft);border-radius:12px;padding:14px}
+  .kpi .v{font-size:22px;font-weight:800}
+  .kpi .k{font-size:11px;color:var(--muted)}
+  .bars{display:flex;align-items:flex-end;gap:10px;height:130px;padding-top:8px}
+  .bars .bar{flex:1;border-radius:7px 7px 0 0;background:linear-gradient(180deg,var(--accent),color-mix(in srgb,var(--accent) 30%,transparent));
+    transition:height 1s cubic-bezier(.2,.8,.2,1)}
+
+  /* faq */
+  .faq{max-width:820px;margin:0 auto}
+  .qa{border:1px solid var(--border);border-radius:14px;margin-bottom:12px;background:var(--card);overflow:hidden}
+  .qa summary{list-style:none;cursor:pointer;padding:18px 22px;font-weight:600;font-size:16px;display:flex;align-items:center;gap:12px}
+  .qa summary::-webkit-details-marker{display:none}
+  .qa summary .pl{margin-left:auto;color:var(--accent);font-size:22px;transition:transform .25s;line-height:1}
+  .qa[open] summary .pl{transform:rotate(45deg)}
+  .qa .a{padding:0 22px 20px;color:var(--text-dim);font-size:15px}
+
+  /* cta band */
+  .band{background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 18%,var(--card)),color-mix(in srgb,var(--violet) 16%,var(--card)));
+    border:1px solid var(--border);border-radius:26px;padding:54px;text-align:center;box-shadow:var(--shadow)}
+  .band h2{margin-bottom:12px}
+  .band .lead{margin:0 auto 26px}
+
+  /* footer */
+  footer{border-top:1px solid var(--border);padding:40px 0;color:var(--muted);font-size:13.5px}
+  .foot{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;align-items:center}
+  .foot a{color:var(--text-dim)}
+  .foot a:hover{color:var(--accent)}
+
+  /* reveal */
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--bg);
+    padding:11px 18px;border-radius:11px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:.3s;z-index:99}
+  .toast.show{opacity:1;transform:translateX(-50%)}
+  code.inline{background:var(--card-2);border:1px solid var(--border);border-radius:6px;padding:2px 7px;font-size:13px}
+</style>
+</head>
+<body>
+<div class="glow"></div>
+
+<header id="hdr">
+  <div class="wrap">
+    <nav>
+      <a class="brand" href="#top">
+        <span class="logo"><img src="logo.ico" alt="Dar AppHub logo" /></span>
+        Dar AppHub
+      </a>
+      <div class="navlinks">
+        <a href="#features">Features</a>
+        <a href="#search">Smart search</a>
+        <a href="#updates">Updates</a>
+        <!-- <a href="#admins">For admins</a> -->
+        <a href="#start">Get started</a>
+        <a href="#faq">FAQ</a>
+      </div>
+      <div class="navtools">
+        <button class="icon-btn" id="themeBtn" title="Toggle theme" aria-label="Toggle theme">🌙</button>
+        <a class="btn btn-primary" href="#start">Get AppHub</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<a id="top"></a>
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div class="reveal">
+        <span class="badge"><span class="dot"></span> Computational Design Team · v1.0.0</span>
+        <h1>Every team tool.<br>One launcher.<br><span class="grad">One click away!</span></h1>
+        <p class="lead">Dar AppHub gathers all of the team's engineering tools into one Windows-native app,
+        and keeps both the app and every tool up to date automatically.</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="#start">Get started →</a>
+          <a class="btn btn-ghost" href="#search">Try smart search</a>
+        </div>
+        <p class="hero-note">Lightweight · auto-updating · runs your tools independently · Windows 11 native</p>
+      </div>
+
+      <div class="reveal" style="transition-delay:.12s">
+        <div class="mock">
+          <div class="titlebar">
+            <span class="logo" style="width:18px;height:18px;border-radius:6px;overflow:hidden"><img src="logo.ico" alt="" style="width:100%;height:100%;object-fit:cover;display:block" /></span>
+            <span class="t">Dar AppHub</span>
+            <span class="spacer"><span class="w"></span><span class="w"></span><span class="w"></span></span>
+          </div>
+          <div class="infobar"><b>Update ready</b> — Dar AppHub v1.1.0 is available.<span class="pill">↻ Restart now</span></div>
+          <div class="body">
+            <div class="side">
+              <div class="nav-item active"><i>▦</i> Applications</div>
+              <div class="nav-item"><i>🧊</i> Revit Add-ins</div>
+              <div class="nav-item"><i>🔧</i> Manage Tools</div>
+              <div class="nav-item"><i>📊</i> Dashboard</div>
+              <div class="nav-item"><i>↻</i> Updates</div>
+            </div>
+            <div class="content">
+              <h4>Applications</h4>
+              <div class="sub">4 tools · 2 Categories:</div>
+              <div class="tiles">
+                <div class="tile"><div class="ic" style="background:linear-gradient(135deg,#4c8dff,#3a78f0)">🛰️</div><div class="nm">Triton</div><div class="meta">v4.2.0</div><div class="go">Launch →</div></div>
+                <div class="tile"><div class="ic" style="background:linear-gradient(135deg,#14b8a6,#0d9488)">🏗️</div><div class="nm">ETABS Co-Pilot</div><div class="meta">v7.0.1</div><div class="go">Launch →</div></div>
+                <div class="tile"><div class="ic" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9)">🔩</div><div class="nm">IDEA StatiCa</div><div class="meta">v6.1.0</div><div class="go">Launch →</div></div>
+                <div class="tile"><div class="ic" style="background:linear-gradient(135deg,#f4a52b,#d97706)">📐</div><div class="nm">Revit Adjust</div><div class="meta">v2.0.0</div><div class="go">Install →</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="stats reveal">
+      <div class="stat"><div class="n" data-count="1">1</div><div class="l">App to install</div></div>
+      <div class="stat"><div class="n" data-count="4" data-suffix="+">4+</div><div class="l">Team tools, one click away</div></div>
+      <div class="stat"><div class="n" data-count="0" data-text="Auto">Auto</div><div class="l">Self-updating</div></div>
+      <div class="stat"><div class="n" data-count="100" data-suffix="%">100%</div><div class="l">Win 11 native</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">What you get</span>
+      <h2>Built to last</h2>
+      <p class="lead">Everything is designed so you spend time using tools, not finding, installing, or updating them.</p>
+    </div>
+    <div class="features">
+      <div class="feature reveal"><div class="fic" style="background:linear-gradient(135deg,#4c8dff,#3a78f0)">▦</div>
+        <h3>One catalog, every tool</h3><p>All team tools appear as tiles, pulled live from the server. Click to run, no shortcuts to chase, no versions to guess.</p></div>
+      <div class="feature reveal" style="transition-delay:.05s"><div class="fic" style="background:linear-gradient(135deg,#14b8a6,#0d9488)">↻</div>
+        <h3>Always up to date</h3><p>Tools refresh themselves to the latest published version, and AppHub updates itself too. When there's a new version, you just click <b>Restart</b>.</p></div>
+      <div class="feature reveal" style="transition-delay:.1s"><div class="fic" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9)">🔎</div>
+        <h3>Smart search</h3><p>Find a tool by an integrated <i>Search Option</i>, no need to manually find them.</p></div>
+      <div class="feature reveal"><div class="fic" style="background:linear-gradient(135deg,#f4a52b,#d97706)">⊞</div>
+        <h3>Windows 11 native</h3><p>A Fluent, Mica-styled interface with automatic dark &amp; light themes that follow your system.</p></div>
+      <div class="feature reveal" style="transition-delay:.05s"><div class="fic" style="background:linear-gradient(135deg,#ef4759,#be123c)">🪟</div>
+        <h3>Runs tools independently</h3><p>Close AppHub and your tool keeps running. Your work is never tied to the launcher.</p></div>
+      <div class="feature reveal" style="transition-delay:.1s"><div class="fic" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8)">📊</div>
+        <h3>Insight, when it matters</h3><p>Authorized personnel get a live dashboard of usage, time saved and reliability — so the tools that help most get the attention they deserve.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="search">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Try it</span>
+      <h2>Search by what you need to do</h2>
+      <p class="lead">This is a live preview of <b>AppHub search</b>. Type a task
+      and watch the matching tools surface. (In the app this gets even smarter with an on-device assistant.)</p>
+    </div>
+    <div class="demo reveal">
+      <label class="searchbox">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3" stroke-linecap="round"/></svg>
+        <input id="q" type="text" placeholder="e.g. ETABS..." autocomplete="off" />
+      </label>
+      <div class="results" id="results"></div>
+    </div>
+  </div>
+</section>
+
+<section id="updates">
+  <div class="wrap">
+    <div class="split">
+      <div class="reveal">
+        <span class="eyebrow">Effortless updates</span>
+        <h2>You'll never run a stale version again</h2>
+        <p class="lead">AppHub quietly checks for new versions in the background and whenever you press
+        <b>Check for updates</b>. Here's all you ever have to do:</p>
+        <ul class="checklist">
+          <li><span class="ck">✓</span><div><b>Tools update themselves.</b> <span>The newest published version is fetched in the background — next launch runs the latest, automatically.</span></div></li>
+          <li><span class="ck">✓</span><div><b>The app updates too.</b> <span>When a new AppHub is released, a gentle amber bar appears.</span></div></li>
+          <li><span class="ck">✓</span><div><b>One click: Restart.</b> <span>Press it and AppHub relaunches on the new version. Any open tools keep running.</span></div></li>
+          <li><span class="ck">✓</span><div><b>Works offline.</b> <span>Can't reach the server? AppHub runs the versions you already have and catches up when you're back.</span></div></li>
+        </ul>
+      </div>
+      <div class="reveal" style="transition-delay:.1s">
+        <div class="dashcard">
+          <div class="infobar" style="margin:0 0 16px"><b>Update ready</b> — v1.0.8 available.<span class="pill">↻ Restart now</span></div>
+          <div style="font-size:13px;color:var(--text-dim);margin-bottom:8px">Background activity</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px"><span style="width:9px;height:9px;border-radius:50%;background:var(--accent-2)"></span> Triton refreshed&nbsp;<span style="color:var(--muted)">v4.2.0 → v4.3.0</span></div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px"><span style="width:9px;height:9px;border-radius:50%;background:var(--accent)"></span> Checked the server for updates&nbsp;<span style="color:var(--muted)">just now</span></div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px"><span style="width:9px;height:9px;border-radius:50%;background:var(--muted)"></span> Next automatic check&nbsp;<span style="color:var(--muted)">in 4 h</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- <section id="admins">
+  <div class="wrap">
+    <div class="split">
+      <div class="reveal">
+        <div class="dashcard">
+          <div class="kpis">
+            <div class="kpi"><div class="v" data-count="5486" style="color:var(--accent)">0</div><div class="k">Runs (30 days)</div></div>
+            <div class="kpi"><div class="v" data-count="318" style="color:var(--accent-2)">0</div><div class="k">Hours saved</div></div>
+            <div class="kpi"><div class="v" data-count="99" data-suffix="%" style="color:var(--violet)">0</div><div class="k">Success rate</div></div>
+          </div>
+          <div style="font-size:12.5px;color:var(--text-dim);margin-bottom:4px">Launches over time</div>
+          <div class="bars" id="bars"></div>
+        </div>
+      </div>
+      <div class="reveal" style="transition-delay:.1s">
+        <span class="eyebrow">For team leads &amp; admins</span>
+        <h2>See what's working, keeping it tidy</h2>
+        <p class="lead">Admins unlock four extra sections, no separate app required:</p>
+        <ul class="checklist">
+          <li><span class="ck">📊</span><div><b>Dashboard.</b> <span>Usage, time saved (ROI), reliability and MCP analytics — plus a Detailed-data tab with sortable, filterable raw records and CSV/PDF export.</span></div></li>
+          <li><span class="ck">🔧</span><div><b>Manage Tools.</b> <span>Add, edit or remove catalog tiles — it even warns you if a version's build isn't on K: yet.</span></div></li>
+          <li><span class="ck">🗂️</span><div><b>Tracking Setup.</b> <span>Maintain tools &amp; parent-tool groupings and their ROI figures directly.</span></div></li>
+          <li><span class="ck">↻</span><div><b>Updates history.</b> <span>A full audit trail of who updated what, and when, across the team.</span></div></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section> -->
+
+<section id="start">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Get started</span>
+      <h2>You're four clicks from done</h2>
+    </div>
+
+    <!-- One-time install from the K: drive -->
+    <div class="demo reveal" style="margin-bottom:34px">
+      <div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap">
+        <div style="background:linear-gradient(135deg,var(--accent),var(--violet));width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:23px;color:#fff;flex:none">⤓</div>
+        <div style="flex:1;min-width:280px">
+          <p class="lead">Copy the path and run <b>DarAppHub-Setup.msi</b> yourself.</p> 
+          <p class="lead" style="margin-bottom:12px">It installs <b>AppHub</b> and adds a shortcut to your <b>Desktop</b>.</p>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <code class="inline" id="kpath" style="font-size:13.5px;padding:10px 14px;word-break:break-all">K:\Dar_Cads\General\Computational Design Team\Setup\DarAppHub\DarAppHub-Setup.msi</code>
+            <button class="btn btn-ghost" id="copyPath" type="button" style="padding:10px 15px">Copy path</button>
+          </div>
+          <p class="hero-note" style="margin-top:14px">Use <b>Copy path</b> and paste it into File Explorer's address bar, then press <b>Enter</b>.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="font-size:14px;color:var(--text-dim);font-weight:600;margin:0 0 32px 20px;text-transform:uppercase;letter-spacing:.08em">Then, every day</h3>
+    <div class="steps">
+      <div class="step reveal" style="transition-delay:.05s"><h3>Open Dar AppHub</h3><p>Launch it from your Desktop like any other app. First run sets itself up automatically.</p></div>
+      <div class="step reveal" style="transition-delay:.1s"><h3>Browse &amp; launch</h3><p>Pick a tool tile and click <b>Launch</b>. AppHub fetches the latest version and runs it.</p></div>
+      <div class="step reveal" style="transition-delay:.15s"><h3>Automatic Updates</h3><p>Automatically checks for newest updates every 4 hours. When an update is available, a notification appears. Click <b>Restart</b> to apply.</p></div>
+      <div class="step reveal" style="transition-delay:.15s"><h3>Keep working</h3><p>Updates happen on their own. When you see the amber bar, click <b>Restart</b>. That's it.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-head reveal" style="text-align:center;margin:0 auto 46px">
+      <span class="eyebrow">Good to know</span>
+      <h2>FAQ</h2>
+    </div>
+    <div class="faq reveal">
+      <details class="qa"><summary>Do I need to install anything myself?<span class="pl">+</span></summary><div class="a">Just a one-time setup. Run <b>DarAppHub-Setup.msi</b> from the K: drive, like previous installations.</div></details>
+      <details class="qa"><summary>Will it slow my computer down?<span class="pl">+</span></summary><div class="a">No. <b>AppHub</b> is a lightweight launcher. It only does work when you open it or click a tool, and updates run quietly in the background.</div></details>
+      <details class="qa"><summary>I closed AppHub — did my tool close too?<span class="pl">+</span></summary><div class="a">No. Tools run as independent programs. Closing/Updating <b>AppHub</b> never interrupts a running tool.</div></details>
+      <details class="qa"><summary>What happens if K: is unreachable?<span class="pl">+</span></summary><div class="a"><b>AppHub</b> is smart enough to keep up with the versions you already have, and quietly catches up the next time the drive is available.</div></details>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="band reveal">
+      <h2>Ready to launch?</h2>
+      <p class="lead">Bring every Dar tool together and never think about updates again.</p>
+      <div class="hero-cta" style="justify-content:center">
+        <a class="btn btn-primary" href="#start">Get Dar AppHub</a>
+        <a class="btn btn-ghost" href="../README.md">Read the docs</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Dar · Computational Design Team — Dar AppHub v1.0.0</div>
+    <div style="display:flex;gap:22px">
+      <a href="../README.md">Documentation</a>
+      <a href="#top">Back to top ↑</a>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  /* ---- theme toggle (persisted) ---- */
+  var root=document.documentElement, tbtn=document.getElementById('themeBtn');
+  function applyTheme(t){root.setAttribute('data-theme',t);tbtn.textContent=t==='dark'?'🌙':'☀️';try{localStorage.setItem('apphub-theme',t)}catch(e){}}
+  var saved; try{saved=localStorage.getItem('apphub-theme')}catch(e){}
+  applyTheme(saved||'dark');
+  tbtn.addEventListener('click',function(){applyTheme(root.getAttribute('data-theme')==='dark'?'light':'dark')});
+
+  /* ---- sticky header shadow ---- */
+  var hdr=document.getElementById('hdr');
+  addEventListener('scroll',function(){hdr.classList.toggle('scrolled',scrollY>8)},{passive:true});
+
+  /* ---- scroll reveal ---- */
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.14});
+  document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
+
+  /* ---- animated counters ---- */
+  function runCount(el){
+    if(el.dataset.text){el.textContent=el.dataset.text;return;}
+    var target=+el.dataset.count, suffix=el.dataset.suffix||'', start=performance.now(), dur=1300;
+    function tick(now){var p=Math.min(1,(now-start)/dur), e=1-Math.pow(1-p,3);
+      el.textContent=Math.round(target*e).toLocaleString()+suffix; if(p<1)requestAnimationFrame(tick);}
+    requestAnimationFrame(tick);
+  }
+  var cio=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){runCount(e.target);cio.unobserve(e.target)}})},{threshold:.5});
+  document.querySelectorAll('[data-count]').forEach(function(el){cio.observe(el)});
+
+  /* ---- dashboard bars ---- */
+  var bars=document.getElementById('bars');
+  if(bars){var hs=[40,55,48,70,62,85,78,95,72,88,100,80];
+    hs.forEach(function(h){var b=document.createElement('div');b.className='bar';b.style.height='0%';bars.appendChild(b);
+      setTimeout(function(){b.style.height=h+'%'},120);});
+    var bio=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){
+      [].forEach.call(bars.children,function(b,i){b.style.height='0%';setTimeout(function(){b.style.height=hs[i]+'%'},80*i)});bio.unobserve(e.target)}})},{threshold:.4});
+    bio.observe(bars);
+  }
+
+  /* ---- smart search demo ---- */
+  var tools=[
+    {nm:"Triton",cat:"Applications",ic:"🛰️",bg:"linear-gradient(135deg,#4c8dff,#3a78f0)",desc:"A suite of structural automation utilities — modelling helpers, batch calculations and design workflows for everyday engineering tasks."},
+    {nm:"ETABS Co-Pilot",cat:"Applications",ic:"🏗️",bg:"linear-gradient(135deg,#14b8a6,#0d9488)",desc:"Batch design and checks driven straight from your ETABS models via the OAPI — automate repetitive analysis and extraction."},
+    {nm:"IDEA StatiCa Assistant",cat:"Applications",ic:"🔩",bg:"linear-gradient(135deg,#8b5cf6,#6d28d9)",desc:"Batch calculation and report generation for steel connections across one or many projects, with interactive 3D views and IFC support."},
+    {nm:"Dar Revit Analytical Adjustment",cat:"Revit Add-ins",ic:"📐",bg:"linear-gradient(135deg,#f4a52b,#d97706)",desc:"A Revit add-in that cleans up and adjusts the analytical model so structural analysis exports are accurate and consistent."}
+  ];
+  var results=document.getElementById('results'), q=document.getElementById('q');
+  function esc(s){return s.replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c]})}
+  function hl(text,term){if(!term)return esc(text);
+    try{return esc(text).replace(new RegExp('('+term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','ig'),'<mark>$1</mark>')}catch(e){return esc(text)}}
+  function render(term){
+    term=(term||'').trim().toLowerCase();
+    var words=term.split(/\s+/).filter(Boolean);
+    var matches=tools.filter(function(t){var hay=(t.nm+' '+t.cat+' '+t.desc).toLowerCase();
+      return words.length===0||words.every(function(w){return hay.indexOf(w)>=0})});
+    results.innerHTML='';
+    if(!matches.length){results.innerHTML='<div class="noresults">No tools match that yet — but ask CDT and it can be added in seconds.</div>';return;}
+    matches.forEach(function(t){var d=document.createElement('div');d.className='rcard';
+      d.innerHTML='<div class="top"><div class="ic" style="background:'+t.bg+'">'+t.ic+'</div><div><div class="nm">'+hl(t.nm,term)+'</div><div class="cat">'+t.cat+'</div></div></div><div class="desc">'+hl(t.desc,term)+'</div>';
+      results.appendChild(d);});
+  }
+  q.addEventListener('input',function(){render(q.value)});
+  document.querySelectorAll('.chip').forEach(function(c){c.addEventListener('click',function(){q.value=c.dataset.q;render(q.value);q.focus()})});
+  render('');
+
+  /* ---- toast + copy request ---- */
+  var toast=document.getElementById('toast'), tt;
+  function showToast(msg){toast.textContent=msg;toast.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){toast.classList.remove('show')},2200);}
+  function copyText(txt,ok){
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(function(){showToast(ok)},function(){showToast('Copy failed — select the text manually')});
+    } else {showToast('Copy not supported here')}
+  }
+  var cr=document.getElementById('copyReq');
+  if(cr)cr.addEventListener('click',function(ev){ev.preventDefault();
+    copyText("Hi IT — please whitelist 'DarAppHub_Shadow.exe' (Dar AppHub launcher) for execution on my machine. It installs under %LOCALAPPDATA%\\DarAppHub. Thanks!",'Whitelist request copied ✓');
+  });
+  var cp=document.getElementById('copyPath');
+  if(cp)cp.addEventListener('click',function(){
+    copyText(document.getElementById('kpath').textContent.trim(),'Setup path copied to Clipboard ✔️');
+  });
+})();
+</script>
+</body>
+</html>
