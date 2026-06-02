@@ -212,6 +212,55 @@
     padding:11px 18px;border-radius:11px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:.3s;z-index:99}
   .toast.show{opacity:1;transform:translateX(-50%)}
   code.inline{background:var(--card-2);border:1px solid var(--border);border-radius:6px;padding:2px 7px;font-size:13px}
+
+  /* guided tour */
+  .tour-wrap{display:flex;flex-direction:column;gap:26px}
+  .tour-stage{position:relative}
+  .tour-canvas{position:relative;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow);background:var(--card)}
+  .tour-canvas img{display:block;width:100%;height:auto}
+  .tour-canvas .zone{position:absolute;border:2px solid var(--accent);border-radius:8px;
+    background:color-mix(in srgb,var(--accent) 12%,transparent);
+    box-shadow:0 0 0 9999px rgba(8,10,15,.5);opacity:0;transform:scale(1.03);
+    transition:opacity .35s ease,transform .35s ease;pointer-events:none;z-index:1}
+  .tour-canvas .zone.on{opacity:1;transform:none}
+  .hot{position:absolute;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;border:none;
+    display:grid;place-items:center;font-size:12.5px;font-weight:800;color:#fff;cursor:pointer;padding:0;
+    background:linear-gradient(135deg,var(--accent),var(--violet));
+    box-shadow:0 4px 14px -2px var(--glow),0 0 0 4px color-mix(in srgb,var(--accent) 22%,transparent);
+    transition:transform .2s,background .2s;z-index:4}
+  .hot:hover{transform:scale(1.18);z-index:7}
+  .hot.on{background:linear-gradient(135deg,var(--accent-2),#0d9488);transform:scale(1.12);z-index:7;
+    box-shadow:0 4px 16px -2px rgba(20,184,166,.6),0 0 0 5px color-mix(in srgb,var(--accent-2) 26%,transparent)}
+  .hot::after{content:"";position:absolute;inset:-7px;border-radius:50%;border:2px solid var(--accent-2);opacity:0}
+  .hot.pulse::after{animation:hp 1.7s ease-out infinite}
+  @keyframes hp{0%{opacity:.55;transform:scale(.65)}100%{opacity:0;transform:scale(1.7)}}
+  /* hover tooltip */
+  .tip{position:absolute;left:50%;bottom:calc(100% + 13px);transform:translateX(-50%) translateY(6px);
+    width:max-content;max-width:250px;text-align:left;font-weight:400;
+    background:var(--bg-elev);color:var(--text);border:1px solid var(--border);border-radius:11px;
+    padding:11px 13px;box-shadow:var(--shadow);opacity:0;visibility:hidden;pointer-events:none;
+    transition:opacity .2s ease,transform .2s ease;z-index:8}
+  .tip .tt{display:block;font-size:13.5px;font-weight:700;letter-spacing:-.01em;margin-bottom:3px}
+  .tip .td{display:block;font-size:12.5px;line-height:1.5;color:var(--text-dim)}
+  .tip .td b{color:var(--accent)} .tip .td i{color:var(--text)}
+  .tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);
+    border:7px solid transparent;border-top-color:var(--bg-elev)}
+  .hot:hover .tip,.hot:focus-visible .tip,.hot.on .tip{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
+  /* tooltip placements (keep clear of the figure edges) */
+  .hot.tdown .tip{bottom:auto;top:calc(100% + 13px);transform:translateX(-50%) translateY(-6px)}
+  .hot.tdown:hover .tip,.hot.tdown:focus-visible .tip,.hot.tdown.on .tip{transform:translateX(-50%) translateY(0)}
+  .hot.tdown .tip::after{top:auto;bottom:100%;border-top-color:transparent;border-bottom-color:var(--bg-elev)}
+  .hot.tstart .tip{left:-13px;transform:translateY(6px)}
+  .hot.tstart:hover .tip,.hot.tstart:focus-visible .tip,.hot.tstart.on .tip{transform:translateY(0)}
+  .hot.tstart .tip::after{left:20px;transform:none}
+  .hot.tend .tip{left:auto;right:-13px;transform:translateY(6px)}
+  .hot.tend:hover .tip,.hot.tend:focus-visible .tip,.hot.tend.on .tip{transform:translateY(0)}
+  .hot.tend .tip::after{left:auto;right:20px;transform:none}
+  /* title-bar close-up */
+  .tbar{position:relative;max-width:720px;margin:26px auto 0}
+  .tbar-canvas{position:relative;border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
+  .tbar-canvas img{display:block;width:100%;height:auto}
+  .tbar .hot{width:23px;height:23px;margin:-11.5px 0 0 -11.5px;font-size:11px}
 </style>
 </head>
 <body>
@@ -226,6 +275,7 @@
       </a>
       <div class="navlinks">
         <a href="#features">Features</a>
+        <a href="#tour">Walkthrough</a>
         <a href="#search">Smart search</a>
         <a href="#updates">Updates</a>
         <!-- <a href="#admins">For admins</a> -->
@@ -323,6 +373,92 @@
     </div>
   </div>
 </section>
+
+<section id="tour">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Guided tour</span>
+      <h2>Know your way around in 60 seconds</h2>
+      <p class="lead">This is the real Dar AppHub window. Hover (or tap) a numbered marker to
+      spotlight that part of the interface and read what it does.</p>
+    </div>
+
+    <div class="tour-wrap reveal">
+      <div class="tour-stage" id="tourStage">
+        <div class="tour-canvas">
+          <img src="media/tour-window.png" alt="Dar AppHub main window, annotated" />
+          <div class="zone" data-i="1" style="left:0.4%;top:5%;width:12%;height:8.6%"></div>
+          <div class="zone" data-i="2" style="left:13.6%;top:5.2%;width:11.5%;height:6.4%"></div>
+          <div class="zone" data-i="3" style="left:85%;top:7%;width:14.4%;height:3.8%"></div>
+          <div class="zone" data-i="4" style="left:13.7%;top:12.2%;width:12.3%;height:17.2%"></div>
+          <div class="zone" data-i="5" style="left:14.6%;top:24.3%;width:10.8%;height:3.8%"></div>
+          <div class="zone" data-i="6" style="left:76.3%;top:0.7%;width:7.7%;height:4%"></div>
+          <div class="zone" data-i="7" style="left:83.7%;top:0.7%;width:9.2%;height:4%"></div>
+          <div class="zone" data-i="8" style="left:0.4%;top:96.6%;width:9.5%;height:2.9%"></div>
+          <div class="zone" data-i="9" style="left:85.3%;top:96.6%;width:14.4%;height:2.9%"></div>
+        </div>
+
+        <!-- markers: hover for a tooltip -->
+        <button class="hot pulse tdown tstart" data-i="1" style="left:6%;top:7.5%" aria-label="Navigation sidebar">1<span class="tip"><span class="tt">Navigation sidebar</span><span class="td">Jump between sections in one click — <b>Applications</b> &amp; <b>Revit Add-ins</b> for everyone.</span></span></button>
+        <button class="hot pulse tdown" data-i="2" style="left:16%;top:8.4%" aria-label="Section header and live count">2<span class="tip"><span class="tt">Section header &amp; live count</span><span class="td">The active section, plus a live tool count (“5 of 5 tools”) that narrows as you search.</span></span></button>
+        <button class="hot pulse tdown tend" data-i="3" style="left:92%;top:8.9%" aria-label="Smart search">3<span class="tip"><span class="tt">Smart search</span><span class="td">Filter the catalog instantly by name or id.</span></span></button>
+        <button class="hot pulse" data-i="4" style="left:19.8%;top:15.5%" aria-label="Tool tile">4<span class="tip"><span class="tt">Tool tile</span><span class="td">Each tool’s icon, name and the <b>exact version</b> AppHub will run — pulled live from the server.</span></span></button>
+        <button class="hot pulse" data-i="5" style="left:20%;top:26.2%" aria-label="Launch button">5<span class="tip"><span class="tt">Launch</span><span class="td">Fetches the newest published build and runs it as its <b>own process</b> — close AppHub and it keeps running.</span></span></button>
+        <button class="hot pulse tdown" data-i="6" style="left:80.2%;top:3%" aria-label="Title-bar quick actions">6<span class="tip"><span class="tt">Title-bar quick actions</span><span class="td">Four one-tap actions: Check for updates, Refresh catalog, Restart &amp; Toggle theme — detailed below. ↓</span></span></button>
+        <button class="hot pulse tdown tend" data-i="7" style="left:88%;top:3%" aria-label="User and role badge">7<span class="tip"><span class="tt">User &amp; role badge</span><span class="td">Who you’re signed in as, your role. Hover more for details.</span></span></button>
+        <button class="hot pulse tstart" data-i="8" style="left:4%;top:98%" aria-label="Catalog summary">8<span class="tip"><span class="tt">Catalog summary</span><span class="td">A quick tally of how many tools and categories are currently loaded.</span></span></button>
+        <button class="hot pulse tend" data-i="9" style="left:92%;top:98%" aria-label="Status indicators">9<span class="tip"><span class="tt">Connectivity · sync · version</span><span class="td">Catalog connectivity (<b>Online/Offline</b>), the <b>last sync</b> time, and the running <b>Shell</b> version.</span></span></button>
+      </div>
+    </div>
+
+    <!-- title-bar close-up -->
+    <div class="sec-head reveal" style="margin:64px 0 0">
+      <span class="eyebrow">Title-bar buttons</span>
+      <h2 style="font-size:clamp(22px,3vw,30px)">Every quick action, up close</h2>
+      <p class="lead">Hover a number to see what each button does.</p>
+    </div>
+    <div class="tbar reveal">
+      <div class="tbar-canvas"><img src="media/tour-toolbar.png" alt="Dar AppHub title-bar buttons close-up" /></div>
+      <button class="hot pulse tdown tstart" data-i="1" style="left:4.8%;top:50%" aria-label="Check for updates">1<span class="tip"><span class="tt">Check for updates</span><span class="td">Runs an update check <b>right now</b> — without disrupting the automatic ~4-hour check.</span></span></button>
+      <button class="hot pulse tdown tstart" data-i="2" style="left:12.7%;top:50%" aria-label="Refresh catalog">2<span class="tip"><span class="tt">Refresh catalog</span><span class="td">Re-pulls the tool list from the server so new or edited tiles appear immediately.</span></span></button>
+      <button class="hot pulse tdown" data-i="3" style="left:20.4%;top:50%" aria-label="Restart">3<span class="tip"><span class="tt">Restart</span><span class="td">Relaunches AppHub to apply a pending update. Open tools keep running.</span></span></button>
+      <button class="hot pulse tdown" data-i="4" style="left:28.1%;top:50%" aria-label="Toggle theme">4<span class="tip"><span class="tt">Toggle theme</span><span class="td">Switch dark / light. By default AppHub follows your Windows theme.</span></span></button>
+      <button class="hot pulse tdown" data-i="5" style="left:52.6%;top:50%" aria-label="User and role">5<span class="tip"><span class="tt">User &amp; role</span><span class="td">The signed-in identity and role badge.</span></span></button>
+      <button class="hot pulse tdown tend" data-i="6" style="left:89%;top:50%" aria-label="Window controls">6<span class="tip"><span class="tt">Window controls</span><span class="td">Standard Windows minimize, maximize and close.</span></span></button>
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  "use strict";
+  // hover-driven spotlight + tooltip markers (shared by both figures)
+  function wire(root){
+    if(!root) return;
+    var hots=[].slice.call(root.querySelectorAll('.hot'));
+    var zones=[].slice.call(root.querySelectorAll('.zone'));
+    var primed=false;
+    function prime(){ if(primed) return; primed=true; hots.forEach(function(h){h.classList.remove('pulse');}); }
+    function act(i){
+      hots.forEach(function(h){h.classList.toggle('on',h.dataset.i===i);});
+      zones.forEach(function(z){z.classList.toggle('on',z.dataset.i===i);});
+    }
+    function clr(){
+      hots.forEach(function(h){h.classList.remove('on');});
+      zones.forEach(function(z){z.classList.remove('on');});
+    }
+    hots.forEach(function(h){
+      h.addEventListener('mouseenter',function(){prime();act(h.dataset.i);});
+      h.addEventListener('mouseleave',clr);
+      h.addEventListener('focus',function(){prime();act(h.dataset.i);});
+      h.addEventListener('blur',clr);
+      h.addEventListener('click',function(){prime();act(h.dataset.i);});
+    });
+  }
+  wire(document.getElementById('tourStage'));
+  wire(document.querySelector('.tbar'));
+})();
+</script>
 
 <section id="search">
   <div class="wrap">
